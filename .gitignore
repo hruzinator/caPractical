@@ -1,3 +1,8 @@
 *.sqlite3
 *.pyc
 reviewsApi/migrations/
+.Python
+bin/
+include/
+lib/
+pip-selfcheck.json

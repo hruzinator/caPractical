@@ -21,8 +21,18 @@ def postReview(request):
     )
     return HttpResponse("placeholder")
 
-def getReview(request):
+def getReview(request, reviewId=9):
     if request.user.is_authenticated == False:
         return HttpResponse("Please log in.")
-    else:
-        return JsonResponse({'test': 'placehoder'})
+    uid = request.user.id
+
+    #TODO check that the user owns the request they are submitting
+    #TODO api tokens
+    return HttpResponse(reviewId)
+    #return JsonResponse({'test': 'placehoder'})
+
+def getOwnReviews(request):
+    if request.user.is_authenticated == False:
+        return HttpResponse("Please log in.")
+    uid = request.user.id
+    return HttpResponse(uid)

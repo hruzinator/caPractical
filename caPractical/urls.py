@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^$', views.index, name="index"),
     url(r'^logout/$', views.site_logout, name="site_logout"),
     url(r'^login/$', views.site_login, name="site_login"),
+    url(r'^signup/$', views.signup, name="signup"),
+    url(r'^settings/$', views.settings, name="settings"),
 
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('reviewsApi.urls')),

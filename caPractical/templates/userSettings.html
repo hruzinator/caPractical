@@ -1,0 +1,31 @@
+<html>
+<head></head>
+<body>
+<h1>Tweak your settings here</h1>
+<form action="/settings/" method="POST">
+  {% csrf_token %}
+  <label><b>First Name</b></label>
+  <input type="text" placeholder="John" name="first_name" required> <p>
+
+  <label><b>Last Name</b></label>
+  <input type="text" placeholder="Smith" name="last_name" required> <p>
+
+  <label><b>Email (optional)</b></label>
+  <input type="text" placeholder="Enter an email address" name="email"> <p>
+
+  <label><b>Username</b></label>
+  <input type="text" placeholder="Enter Username" name="username" required> <p>
+
+  <label><b>Password</b></label>
+  <input type="password" placeholder="Enter Password" name="password" required> <p>
+
+  <label><b> Confirm Password</b></label>
+  <input type="password" placeholder="Enter Password" name="passwordConfirmation" required> <p>
+
+  <button type="submit">Update</button>
+</form>
+<ul>
+  <li><a href="/logout/">Logout</li>
+</ul>
+</body>
+</html>

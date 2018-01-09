@@ -4,8 +4,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template import loader
+from django.contrib.auth.models import User
 
 def index(request):
+    #TODO render something different if the user is not logged in yet
     template = loader.get_template("index.html")
     return HttpResponse(template.render({}, request))
 
@@ -30,4 +32,44 @@ def site_logout(request):
     logout(request)
     return redirect("site_login")
 
-#TODO change password
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect("settings")
+    if request.method == 'GET':
+        template = loader.get_template("signUp.html")
+        return HttpResponse(template.render({}, request))
+    if request.method == 'POST':
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        email_name = request.POST['email']
+        username = request.POST['username']
+        password = request.POST['password']
+        confirm_password = request.POST['passwordConfirmation']
+
+        #TODO data validation checks
+        if password != confirm_password:
+            return HttpResponse("Passwords do not match!")
+
+        newUser = User.objects.create_user(username, email_name, password)
+        newUser.first_name = first_name
+        newUser.last_name = last_name
+        newUser.save()
+        return redirect("index")
+
+def settings(request):
+    if request.user.is_authenticated is False:
+        return redirect("signup")
+    if request.method == 'GET':
+        template = loader.get_template("userSettings.html")
+        return HttpResponse(template.render({}, request))
+    if request.method == 'POST':
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        email_name = request.POST['email']
+        username = request.POST['username']
+        password = request.POST['password']
+        confirm_password = request.POST['passwordConfirmation']
+
+        #TODO update the user
+
+        return redirect("index")

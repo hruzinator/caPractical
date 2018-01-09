@@ -1,8 +1,9 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    url(r'^postReview/', views.postReview, name="postReview"),
-    url(r'^getReview/',views.getReview, name="getReview")
+    path('postReview/', views.postReview, name="postReview"),
+    path('getReview/<int:reviewId>/',views.getReview, name="getReview"),
+    path('getOwnReviews/', views.getOwnReviews, name="getOwnReviews")
 ]
