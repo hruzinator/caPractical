@@ -7,3 +7,5 @@ include/
 lib/
 pip-selfcheck.json
 .coverage
+htmlcov/
+.DS_Store
