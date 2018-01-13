@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 
 from django.test import TestCase, Client
 
-from .models import Review, Company, ReviewerMetadata
+from .models import Review, Company, ReviewerMetadata, ApiKey
 
 from django.contrib.auth.models import User
+import uuid
 
 #API tests
 class APITestCase(TestCase):
@@ -13,6 +14,10 @@ class APITestCase(TestCase):
         self.c = Client()
         #create a user
         user = User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
+        #create an API key for the user
+        api_key = ApiKey.objects.create(user_id=user)
+        self.userApiKey = api_key.key
+
         #log in
         self.c.post('/login/', {'username': 'temporary', 'password': 'temporary'})
         #create a company
@@ -58,12 +63,13 @@ class APITestCase(TestCase):
             reviewer_metadata = rm3
         )
 
-    def testSendReviewData(self):
+    def testPostReview(self):
         data = {
           "title": "Got sick from eating Jack in the Box",
           "rating": 1,
           "summary": "I ordered a burger from Jack in the Box one night. I awoke the next morning with food poisioning.",
-          "company": 1
+          "company": 1,
+          "api_key": self.userApiKey
         }
         response = self.c.post("/api/postReview/", data)
         self.assertEqual(response.content, b'Submission successful')
@@ -71,12 +77,40 @@ class APITestCase(TestCase):
         reviewObj = Review.objects.filter(title="Got sick from eating Jack in the Box")
         self.assertEqual(len(reviewObj), 1)
 
-    def testSendBadCompanyID(self):
+    def testSendBadApiKeyPostReview(self):
+        data = {
+          "title": "Sending bad API key",
+          "rating": 1,
+          "summary": "I ordered a burger from Jack in the Box one night. I awoke the next morning with food poisioning.",
+          "company": 1,
+          "api_key": uuid.uuid4() #generate a different uuid
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Api Key could not be validated')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title="Sending bad API key")
+        self.assertEqual(len(reviewObj), 0)
+
+    def testSendNoApiKeyPostReview(self):
+        data = {
+          "title": "Not sending an api key",
+          "rating": 1,
+          "summary": "I ordered a burger from Jack in the Box one night. I awoke the next morning with food poisioning.",
+          "company": 1,
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'API key required to acess this part of the API')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title="Not sending an api key")
+        self.assertEqual(len(reviewObj), 0)
+
+    def testSendBadCompanyIDPostReview(self):
         data = {
           "title": "testing bad id",
           "rating": 1,
           "summary": "I ordered a burger from Jack in the Box one night. I awoke the next morning with food poisioning.",
-          "company": 50
+          "company": 50,
+          "api_key": self.userApiKey
         }
         response = self.c.post("/api/postReview/", data)
         self.assertEqual(response.content, b'Company id not found')
@@ -92,12 +126,13 @@ class APITestCase(TestCase):
         reviewObj = Review.objects.filter(title="testing another bad id")
         self.assertEqual(len(reviewObj), 0)
 
-    def testBadRating(self):
+    def testBadRatingPostReview(self):
         data = {
           "title": "testing bad rating",
           "rating": -7,
           "summary": "I ordered a burger from Jack in the Box one night. I awoke the next morning with food poisioning.",
-          "company": 50
+          "company": 50,
+          "api_key": self.userApiKey
         }
         response = self.c.post("/api/postReview/", data)
         self.assertEqual(response.content, b'rating needs to be a whole number from 1 to 5 inclusive')
@@ -122,31 +157,51 @@ class APITestCase(TestCase):
         self.assertEqual(len(reviewObj), 0)
 
     def testGetReview(self):
-        response = self.c.get('/api/getReview/1/')
+        response = self.c.post('/api/getReview/1/', {"api_key" : self.userApiKey})
         self.assertEqual(response.status_code, 200)
         j = response.json()["fields"]
         self.assertEqual(j["title"], "I can tolerate Jack in the Box")
         self.assertEqual(j["rating"], 3)
         self.assertEqual(j["summary"], "Jack in the box makes sub-par burgers, but I didn't get sick from eating them")
 
+    def testBadApiKeyGetReview(self):
+        response = self.c.post('/api/getReview/1/', {"api_key" : uuid.uuid4()})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'Api Key could not be validated')
+
+    def testNoApiKeyGetReview(self):
+        response = self.c.post('/api/getReview/1/', {})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'API key required to acess this part of the API')
+
     def testGetNonExistantReview(self):
-        response = self.c.get('api/getReview/100/')
+        response = self.c.post('api/getReview/100/', {"api_key" : self.userApiKey})
         self.assertEqual(response.status_code, 404)
 
     def testGetMyReviews(self):
-        response = self.c.get('/api/getOwnReviews/')
+        response = self.c.post('/api/getOwnReviews/', {"api_key" : self.userApiKey})
         j = response.json()
         j0 = j[0]["fields"]
         j1 = j[1]["fields"]
         self.assertEqual(j0['title'], 'I can tolerate Jack in the Box')
         self.assertEqual(j1['title'], 'I actually find Jack in the box good for some reason')
 
+    def testBadApiKeyGetMyReviews(self):
+        response = self.c.post('/api/getOwnReviews/', {"api_key" : uuid.uuid4()})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'Api Key could not be validated')
+
+    def testNoApiKeyGetMyReviews(self):
+        response = self.c.post('/api/getOwnReviews/', {})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'API key required to acess this part of the API')
+
     def testGetUnauthorizedReview(self):
-        response = self.c.get('/api/getReview/3/')
+        response = self.c.post('/api/getReview/3/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'Access Denied')
         self.c.get('/logout/')
-        response = self.c.get('/api/getReview/1/')
+        response = self.c.post('/api/getReview/1/', {"api_key" : self.userApiKey})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'Please log in.')
 
@@ -166,6 +221,6 @@ class APITestCase(TestCase):
 
     def testGetMyReviewsLogout(self):
         self.c.get('/logout/')
-        response = self.c.get('/api/getOwnReviews/')
+        response = self.c.post('/api/getOwnReviews/', {"api_key" : self.userApiKey})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'Please log in.')

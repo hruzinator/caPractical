@@ -28,3 +28,7 @@ class Company(models.Model):
 class ReviewerMetadata(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254)
+
+class ApiKey(models.Model):
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, models.PROTECT)
+    key = models.UUIDField(default=uuid.uuid4)
