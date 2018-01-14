@@ -33,7 +33,7 @@ Submits a review to the API. Must contain the following fields:
 * **api_key** the API key given to the user, indicating authorization to access the API
 
 ## /api/getReview/<review_id>/
-Retrieves the review with id *review_id*, which is passed in the URL path. Users are only authorized to view reviews they themselves submitted, and only if they are logged in. Additionaly, the post must contain the following field:
+Retrieves the review with id *review_id*, which is passed in the URL path. Users are only authorized to view reviews they themselves submitted, and only if they are logged in. Additionally, the post must contain the following field:
 * **api_key** he API key given to the user, indicating authorization to access the API
 
 If authentication and authorization is verified, the API will respond with a serialized JSON representation of the review model in the database.
@@ -45,6 +45,6 @@ Retrieves all reviews submitted by the logged-in user. Must contain the followin
 If authentication and authorization is verified, the API will respond with a serialized JSON representation of all the reviews submitted by the user.
 
 # Administrator's interface
-Like most Django applications, there is an administrator's interface accessible at /admin. You need to be a superuser to access it. See [Djano's documentation](https://docs.djangoproject.com/en/2.0/intro/tutorial02/#creating-an-admin-user) for more information about creating admin users if you don't have one set up yet. All models are registered, allowing for a good deal of configurability on the part of the Administrator.
+Like most Django applications, there is an administrator's interface accessible at /admin. You need to be a superuser to access it. See [Django's documentation](https://docs.djangoproject.com/en/2.0/intro/tutorial02/#creating-an-admin-user) for more information about creating admin users if you don't have one set up yet. All models are registered, allowing for a good deal of configurability on the part of the Administrator.
 
 As mentioned above, you will need to create an API key for a user in order to allow that user to access the API. You can do this by logging in at /admin, then going to REVIEWSAPI > Api Keys. In the top-right corner, you will see a button called *Add API Key*. You can then select a user and get an API key. API keys are UUID4 format keys. A default one is provided for you, but you can enter your own if you desire.
