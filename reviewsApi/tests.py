@@ -126,6 +126,72 @@ class APITestCase(TestCase):
         reviewObj = Review.objects.filter(title="testing another bad id")
         self.assertEqual(len(reviewObj), 0)
 
+    def testMissingTitlePostReview(self):
+        data = {
+          "rating": 1,
+          "summary": "I think titles are stupid",
+          "company": 1,
+          "api_key": self.userApiKey
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Missing required field')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(summary="I think titles are stupid")
+        self.assertEqual(len(reviewObj), 0)
+
+    def testMissingSummaryPostReview(self):
+        data = {
+          "title": "This title is so good I don\'t need a summary!",
+          "rating": 1,
+          "company": 1,
+          "api_key": self.userApiKey
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Missing required field')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title="This title is so good I don\'t need a summary!")
+        self.assertEqual(len(reviewObj), 0)
+
+    def testMissingRatingPostReview(self):
+        data = {
+          "title": "This title is so good I don\'t need a rating!",
+          "summary": "test",
+          "company": 1,
+          "api_key": self.userApiKey
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Missing required field')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title="This title is so good I don\'t need a rating!")
+        self.assertEqual(len(reviewObj), 0)
+
+    def testMissingSummaryPostReview(self):
+        data = {
+          "title": "This title is so good I don\'t need a company id!",
+          "summary": "test",
+          "rating": 1,
+          "company": 1,
+          "api_key": self.userApiKey
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Missing required field')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title="This title is so good I don\'t need a company id!")
+        self.assertEqual(len(reviewObj), 0)
+
+    def testMissingSummaryPostReview(self):
+        data = {
+          "title": "This title is so good I don\'t need a summary!",
+          "rating": 1,
+          "company": 1,
+          "api_key": self.userApiKey
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Missing required field')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title="This title is so good I don\'t need a summary!")
+        self.assertEqual(len(reviewObj), 0)
+
     def testBadRatingPostReview(self):
         data = {
           "title": "testing bad rating",

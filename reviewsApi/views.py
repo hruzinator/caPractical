@@ -7,12 +7,23 @@ from .models import Review, Company, ReviewerMetadata, ApiKey
 from django.template import loader
 from django.core import serializers
 import json
+from django.utils.datastructures import MultiValueDictKeyError
 
 # Create your views here.
 def postReview(request):
     if request.user.is_authenticated == False:
         return HttpResponse("Please log in.")
 
+    #get values from request
+    try:
+        title = request.POST["title"]
+        rating = request.POST["rating"]
+        company_id = request.POST["company"]
+        summary = request.POST["summary"]
+    except MultiValueDictKeyError:
+        return HttpResponse("Missing required field")
+
+    #special error message for API key
     try:
         api_key = request.POST["api_key"]
     except:
@@ -21,21 +32,21 @@ def postReview(request):
         return HttpResponse("Api Key could not be validated")
 
     try:
-        r = int(request.POST["rating"])
+        r = int(rating)
     except ValueError:
         return HttpResponse("rating needs to be a whole number from 1 to 5 inclusive")
 
     if r < 1 or r > 5:
         return HttpResponse("rating needs to be a whole number from 1 to 5 inclusive")
 
-    if len(request.POST["title"]) > 64:
+    if len(title) > 64:
         return HttpResponse("Title can be no longer than 64 characters")
 
-    if len(request.POST["summary"]) > 10000:
+    if len(summary) > 10000:
         return HttpResponse("Summary can be no longer than 10,000 characters")
 
     try:
-        company_id = int(request.POST["company"])
+        company_id = int(company_id)
     except ValueError:
         return HttpResponse("invalid company id format")
 
@@ -52,9 +63,9 @@ def postReview(request):
     rm.save()
 
     review = Review(
-        title = request.POST["title"],
+        title = title,
         rating = r,
-        summary = request.POST["summary"],
+        summary = summary,
         ip_address = request.get_host(),
         company = company_obj,
         user_id = request.user,
