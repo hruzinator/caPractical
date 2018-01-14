@@ -156,6 +156,34 @@ class APITestCase(TestCase):
         reviewObj = Review.objects.filter(title="non-whole number bad rating")
         self.assertEqual(len(reviewObj), 0)
 
+    def testSendLongTitlePostReview(self):
+        data = {
+          "title": 'A'*65,
+          "rating": 1,
+          "summary": "I ordered a burger from Jack in the Box one night. I awoke the next morning with food poisioning.",
+          "company": 1,
+          "api_key": self.userApiKey
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Title can be no longer than 64 characters')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title='A'*65)
+        self.assertEqual(len(reviewObj), 0)
+
+    def testSendLongSummaryPostReview(self):
+        data = {
+          "title": "The summary should be too long to post",
+          "rating": 1,
+          "summary": 'A'*10001,
+          "company": 1,
+          "api_key": self.userApiKey
+        }
+        response = self.c.post("/api/postReview/", data)
+        self.assertEqual(response.content, b'Summary can be no longer than 10,000 characters')
+        self.assertEqual(response.status_code, 200)
+        reviewObj = Review.objects.filter(title="The summary should be too long to post")
+        self.assertEqual(len(reviewObj), 0)
+
     def testGetReview(self):
         response = self.c.post('/api/getReview/1/', {"api_key" : self.userApiKey})
         self.assertEqual(response.status_code, 200)

@@ -28,6 +28,12 @@ def postReview(request):
     if r < 1 or r > 5:
         return HttpResponse("rating needs to be a whole number from 1 to 5 inclusive")
 
+    if len(request.POST["title"]) > 64:
+        return HttpResponse("Title can be no longer than 64 characters")
+
+    if len(request.POST["summary"]) > 10000:
+        return HttpResponse("Summary can be no longer than 10,000 characters")
+
     try:
         company_id = int(request.POST["company"])
     except ValueError:

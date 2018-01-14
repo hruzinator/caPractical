@@ -26,10 +26,10 @@ The Reviews API can be accessed by issuing a POST request to the documented endp
 
 ## /api/postReview/
 Submits a review to the API. Must contain the following fields:
-* **title** Title of the review
+* **title** Title of the review. Can be no longer than 64 characters long.
 * **company** ID number (primary key) of the Company being reviewed.
 * **rating** An integer ranging from 1 to 5, inclusive
-* **summary** The long-form description of the review.
+* **summary** The long-form description of the review. Can be no longer than 10000 characters long
 * **api_key** the API key given to the user, indicating authorization to access the API
 
 ## /api/getReview/<review_id>/
