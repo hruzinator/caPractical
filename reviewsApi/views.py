@@ -26,7 +26,7 @@ def postReview(request):
     #special error message for API key
     try:
         api_key = request.POST["api_key"]
-    except:
+    except MultiValueDictKeyError:
         return HttpResponse("API key required to acess this part of the API")
     if validApiKey(request.user, api_key) == False:
         return HttpResponse("Api Key could not be validated")
