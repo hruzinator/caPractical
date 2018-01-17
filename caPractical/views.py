@@ -5,11 +5,16 @@ from django.http import HttpResponse, Http404, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template import loader
 from django.contrib.auth.models import User
+from reviewsApi.models import Company
 
 def index(request):
-    #TODO render something different if the user is not logged in yet
-    template = loader.get_template("index.html")
-    return HttpResponse(template.render({}, request))
+    if request.user.is_authenticated:
+        template = loader.get_template("index.html")
+        return HttpResponse(template.render({}, request))
+    else:
+        template = loader.get_template("login.html")
+        return HttpResponse(template.render({}, request))
+
 
 def site_login(request):
     if request.user.is_authenticated:
@@ -73,3 +78,15 @@ def settings(request):
         #TODO update the user
 
         return redirect("index")
+
+
+def submitReview(request):
+    if request.user.is_authenticated is False:
+        return redirect("signup")
+    c_list = Company.objects.all()
+    template = loader.get_template("postReview.html")
+    return HttpResponse(template.render({"companies":c_list}, request))
+
+#TODO
+def getReviews(request):
+    return HttpResponse("placeholder")

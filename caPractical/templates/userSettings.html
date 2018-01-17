@@ -1,6 +1,10 @@
 <html>
 <head></head>
 <body>
+<ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/logout/">Logout</a></li>
+</ul>
 <h1>Tweak your settings here</h1>
 <form action="/settings/" method="POST">
   {% csrf_token %}
@@ -24,8 +28,5 @@
 
   <button type="submit">Update</button>
 </form>
-<ul>
-  <li><a href="/logout/">Logout</li>
-</ul>
 </body>
 </html>

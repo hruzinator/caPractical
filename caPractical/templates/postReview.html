@@ -1,0 +1,41 @@
+<html>
+<head>
+  <title>Submit a Revew</title>
+</head>
+<body>
+<ul>
+  <li><a href="/settings">Edit your settings</a></li>
+  <li><a href="/logout/">Logout</a></li>
+</ul>
+<h1>Post a reveiw here</h1>
+<form action='/api/postReview/' method="POST">
+  {% csrf_token %}
+  <label><b>Title</b></label>
+  <input type="text" name="title" required> <p>
+
+  <label><b>Company</b></label>
+  <select>
+    {% for company in companies %}
+      <option value="{{ company.id }}">{{ company.name }}</option>
+    {% endfor %}
+  </select> <p>
+
+  <label><b>Rating</b></label>
+  <select name="rating" required>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select> <p>
+
+  <label><b>Summary</b></label>
+  <input type="text" name="summary" required> <p>
+
+  <label><b>API key</b></label>
+  <input type="text" name="api_key" required> <p>
+
+  <button type="submit">Submit</button>
+</form>
+</body>
+</html>

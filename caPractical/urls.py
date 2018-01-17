@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^login/$', views.site_login, name="site_login"),
     url(r'^signup/$', views.signup, name="signup"),
     url(r'^settings/$', views.settings, name="settings"),
+    url(r'^submitReview/$', views.submitReview, name="submitReview"),
+    url(r'^getReviews/$', views.getReviews, name="getReviews"),
 
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('reviewsApi.urls')),
