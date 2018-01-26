@@ -21,6 +21,16 @@ Optional:
 * Document the API
 Organize the schema and data models in whatever manner you think makes the most sense and feel free to add any additional style and flair to the project that you'd like.
 
+# General Setup Requirements (assuming *NIX system)
+1. Install Python3. Make sure it is your default version. You can check by running `python` and seeing which version is installed. If the version listed is 2.7, you will need to update. Follow instructions for your operating system.
+2. Install virtualenv through your operating system's package manager
+3. Install pip, the python package management system, using your operating system's package manager
+4. Navigate to your project folder and run `virtualenv --python=python3 ./`. This will create a folder called "bin". Make sure its gitignored in .gitignore
+5. Run `source bin/activate` to actiavte the virtual environment.
+6. run `pip install -r requirements.txt`. If you get errors, try checking your python version and your version of pip with `pip -V`
+7. Run database migrations by running `python manage.py makemigrations`, then `python manage.py migrate`
+8. You can now test out running the server using `python manage.py runserver`. You can access the site at 127.0.0.1:8000.
+
 # Reviews API
 The Reviews API can be accessed by issuing a POST request to the documented endpoints. Each request must, at a minimum, be sent with a field entitled "api_key". Information about how to create API keys is documented below in Administrator's interface. In addition to providing an API key, the user must be logged in through Django's default authentication system. This provides Django with user information, while the API key proves the user has been given authorization to use the API.
 
