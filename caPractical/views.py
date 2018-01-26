@@ -12,8 +12,7 @@ def index(request):
         template = loader.get_template("index.html")
         return HttpResponse(template.render({}, request))
     else:
-        template = loader.get_template("login.html")
-        return HttpResponse(template.render({}, request))
+        return redirect("site_login")
 
 
 def site_login(request):
@@ -36,57 +35,3 @@ def site_login(request):
 def site_logout(request):
     logout(request)
     return redirect("site_login")
-
-def signup(request):
-    if request.user.is_authenticated:
-        return redirect("settings")
-    if request.method == 'GET':
-        template = loader.get_template("signUp.html")
-        return HttpResponse(template.render({}, request))
-    if request.method == 'POST':
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        email_name = request.POST['email']
-        username = request.POST['username']
-        password = request.POST['password']
-        confirm_password = request.POST['passwordConfirmation']
-
-        #TODO data validation checks
-        if password != confirm_password:
-            return HttpResponse("Passwords do not match!")
-
-        newUser = User.objects.create_user(username, email_name, password)
-        newUser.first_name = first_name
-        newUser.last_name = last_name
-        newUser.save()
-        return redirect("index")
-
-def settings(request):
-    if request.user.is_authenticated is False:
-        return redirect("signup")
-    if request.method == 'GET':
-        template = loader.get_template("userSettings.html")
-        return HttpResponse(template.render({}, request))
-    if request.method == 'POST':
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        email_name = request.POST['email']
-        username = request.POST['username']
-        password = request.POST['password']
-        confirm_password = request.POST['passwordConfirmation']
-
-        #TODO update the user
-
-        return redirect("index")
-
-
-def submitReview(request):
-    if request.user.is_authenticated is False:
-        return redirect("signup")
-    c_list = Company.objects.all()
-    template = loader.get_template("postReview.html")
-    return HttpResponse(template.render({"companies":c_list}, request))
-
-#TODO
-def getReviews(request):
-    return HttpResponse("placeholder")
